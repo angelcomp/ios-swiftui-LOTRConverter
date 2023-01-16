@@ -11,6 +11,8 @@ struct ContentView: View {
     
     @State private var leftAmount = ""
     @State private var rightAmount = ""
+    @State private var leftCurrency: Currency = .goldPiece
+    @State private var rightCurrency: Currency = .silverPenny
     
     var body: some View {
         ZStack {
@@ -31,12 +33,20 @@ struct ContentView: View {
                 HStack {
                     VStack {
                         HStack {
-                            Image("silverpiece")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(height: 33)
+                            Image(
+                                CurrencyImage.allCases[
+                                    Currency.allCases.firstIndex(of: leftCurrency)!
+                                ].rawValue
+                            )
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 33)
                             
-                            Text("Silver Piece")
+                            Text(
+                                CurrencyText.allCases[
+                                    Currency.allCases.firstIndex(of: leftCurrency)!
+                                ].rawValue
+                            )
                                 .foregroundColor(.white)
                                 .font(.headline)
                         }
@@ -54,11 +64,19 @@ struct ContentView: View {
                     
                     VStack {
                         HStack {
-                            Text("Gold Piece")
+                            Text(
+                                CurrencyText.allCases[
+                                    Currency.allCases.firstIndex(of: rightCurrency)!
+                                ].rawValue
+                            )
                                 .foregroundColor(.white)
                                 .font(.headline)
                             
-                            Image("goldpiece")
+                            Image(
+                                CurrencyImage.allCases[
+                                    Currency.allCases.firstIndex(of: rightCurrency)!
+                                ].rawValue
+                            )
                                 .resizable()
                                 .scaledToFit()
                                 .frame(height: 33)

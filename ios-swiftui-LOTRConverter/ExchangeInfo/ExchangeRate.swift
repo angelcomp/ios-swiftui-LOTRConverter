@@ -12,13 +12,7 @@ struct ExchangeRate: View {
     @State var leftImage: String
     @State var description: String
     @State var rightImage: String
-    
-    init(leftImage: String, description: String, rightImage: String) {
-        self.leftImage = leftImage
-        self.description = description
-        self.rightImage = rightImage
-    }
-    
+
     var body: some View {
         HStack {
             Image(leftImage)
