@@ -13,6 +13,12 @@ struct ContentView: View {
     @State private var rightAmount = ""
     @State private var leftCurrency: Currency = .goldPiece
     @State private var rightCurrency: Currency = .silverPenny
+    @State private var showSelectCurrency = false
+    @State private var showExchangeInfo = false
+    @State private var leftTyping = false
+    @State private var rightTyping = false
+    @State private var leftAmountTemp = ""
+    @State private var rightAmountTemp = ""
     
     var body: some View {
         ZStack {
@@ -50,12 +56,24 @@ struct ContentView: View {
                                 .foregroundColor(.white)
                                 .font(.headline)
                         }
-                        .padding(.bottom, -5)
+                        .padding(.bottom, -5).onTapGesture {
+                            showSelectCurrency.toggle()
+                        }
+                        .sheet(isPresented: $showSelectCurrency) {
+                            SelectCurrency(leftCurrency: $leftCurrency, rightCurrency: $rightCurrency)
+                        }
                         
-                        TextField("Amount", text: $leftAmount)
-                            .padding(7)
-                            .background(Color(UIColor.systemGray6))
-                            .cornerRadius(7)
+                        TextField("Amount", text: $leftAmount, onEditingChanged: { typing in
+                            leftTyping = typing
+                            leftAmountTemp = leftAmount
+                        })
+                        .padding(7)
+                        .background(Color(UIColor.systemGray6))
+                        .cornerRadius(7)
+                        .keyboardType(.decimalPad)
+                        .onChange(of: leftTyping ? leftAmount : leftAmountTemp) { _ in
+                            rightAmount = leftCurrency.convert(amountString: leftAmount, to: rightCurrency)
+                        }
                     }
                     
                     Image(systemName: "equal")
@@ -82,15 +100,30 @@ struct ContentView: View {
                                 .frame(height: 33)
                         }
                         .padding(.bottom, -5)
+                        .onTapGesture {
+                            showSelectCurrency.toggle()
+                        }
+                        .sheet(isPresented: $showSelectCurrency) {
+                            SelectCurrency(leftCurrency: $leftCurrency, rightCurrency: $rightCurrency)
+                        }
                         
-                        TextField("Amount", text: $rightAmount)
-                            .padding(10)
-                            .background(Color(UIColor.systemGray6))
-                            .cornerRadius(7)
-                            .multilineTextAlignment(.trailing)
+                        TextField("Amount", text: $rightAmount, onEditingChanged: { typing in
+                            rightTyping = typing
+                            rightAmountTemp = rightAmount
+                        })
+                        .padding(7)
+                        .background(Color(UIColor.systemGray6))
+                        .cornerRadius(7)
+                        .keyboardType(.decimalPad)
+                        .onChange(of: rightTyping ? rightAmount : rightAmountTemp) { _ in
+                            leftAmount = rightCurrency.convert(amountString: rightAmount, to: leftCurrency)
+                        }
+                        .onChange(of: rightCurrency) { _ in
+                            rightAmount = leftCurrency.convert(amountString: leftAmount, to: rightCurrency)
+                        }
                     }
                 }
-                .padding()
+                .padding(32)
                 .background(.black.opacity(0.5))
                 .cornerRadius(50)
                 
@@ -100,14 +133,17 @@ struct ContentView: View {
                     Spacer()
                     
                     Button {
-                        
+                        showExchangeInfo.toggle()
                     } label: {
                         Image(systemName: "info.circle.fill")
                     }
                     .font(.largeTitle)
                     .foregroundColor(.white)
+                    .padding([.trailing, .bottom])
+                    .sheet(isPresented: $showExchangeInfo) {
+                        ExchangeInfo()
+                    }
                 }
-                .padding(.trailing)
             }
         }
     }
